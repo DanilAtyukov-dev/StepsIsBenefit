@@ -28,7 +28,7 @@ val Context.appComponent: AppComponent
         is App -> appComponent
         else -> this.applicationContext.appComponent
     }
-public val Context.appContext: Context
+val Context.appContext: Context
     get() = when (this) {
         is App -> context
         else -> this.applicationContext.appContext

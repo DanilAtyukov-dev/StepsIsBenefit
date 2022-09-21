@@ -19,9 +19,9 @@ import javax.inject.Inject
 
 class LoginActivity : BaseActivity() {
 
-    lateinit var mGoogleSignInClient: GoogleSignInClient
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
     private val rcSignIn: Int = 516414
-    var firebaseAuth = FirebaseAuth.getInstance()
+    private var firebaseAuth = FirebaseAuth.getInstance()
 
     @Inject
     lateinit var gso: GoogleSignInOptions
@@ -65,7 +65,7 @@ class LoginActivity : BaseActivity() {
         }
     }
 
-    // UpdateUI() function - this is where we specify what UI updation are needed after google signin has taken place.
+    // UpdateUI() function - this is where we specify what UI updating are needed after google signin has taken place.
     private fun UpdateUI(account: GoogleSignInAccount) {
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->

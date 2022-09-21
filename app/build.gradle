@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
     id 'kotlin-kapt'
+    id 'kotlin-android-extensions'
 }
 
 android {
@@ -38,6 +39,7 @@ android {
 
 dependencies {
 
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.4.2" //решило проблему kapt
     //даггер
     implementation 'com.google.dagger:dagger:2.36'

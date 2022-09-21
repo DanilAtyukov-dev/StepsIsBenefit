@@ -4,6 +4,10 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/atyuk/AndroidStudioProjects/LinkedMoney/app/src/main/res/layout/activity_login2.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/atyuk/AndroidStudioProjects/LinkedMoney/app/src/main/res/layout/activity_main.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/atyuk/AndroidStudioProjects/LinkedMoney/app/src/main/res/layout/fragment_dashboard.xml" value="0.2" />
+        <entry key="..\:/Users/atyuk/AndroidStudioProjects/LinkedMoney/app/src/main/res/layout/fragment_home.xml" value="0.32065217391304346" />
+        <entry key="..\:/Users/atyuk/AndroidStudioProjects/LinkedMoney/app/src/main/res/layout/fragment_pedometer.xml" value="0.32065217391304346" />
       </map>
     </option>
   </component>

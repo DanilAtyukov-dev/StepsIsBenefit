@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.danilatyukov.linkedmoney.databinding.FragmentDashboardBinding
+import com.danilatyukov.linkedmoney.ui.pedometer.PedometerFragment
 
 class DashboardFragment : Fragment() {
 
@@ -32,6 +33,11 @@ class DashboardFragment : Fragment() {
         dashboardViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
+
+        /*parentFragmentManager.beginTransaction()
+            .add(_binding!!.pedometerFCV.id, PedometerFragment.newInstance())
+            .commit()*/
+
         return root
     }
 

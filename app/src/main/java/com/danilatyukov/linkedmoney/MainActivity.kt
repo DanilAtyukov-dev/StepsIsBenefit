@@ -1,14 +1,11 @@
 package com.danilatyukov.linkedmoney
 
 import android.os.Bundle
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.danilatyukov.linkedmoney.data.RetrievedPreference
 import com.danilatyukov.linkedmoney.databinding.ActivityMainBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class MainActivity : BaseActivity() {
@@ -30,12 +27,12 @@ class MainActivity : BaseActivity() {
         showToast("${RetrievedPreference.getEmail()}, ${RetrievedPreference.getUsername()}")
     }
 
-    private fun setActionBar(c: NavController){
+    /*private fun setActionBar(c: NavController){
         val appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
             )
         )
         setupActionBarWithNavController(c, appBarConfiguration)
-    }
+    }*/
 }
