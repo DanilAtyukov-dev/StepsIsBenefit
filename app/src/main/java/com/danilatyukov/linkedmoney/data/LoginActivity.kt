@@ -7,6 +7,9 @@ import com.danilatyukov.linkedmoney.BaseActivity
 import com.danilatyukov.linkedmoney.MainActivity
 import com.danilatyukov.linkedmoney.R
 import com.danilatyukov.linkedmoney.appComponent
+import com.danilatyukov.linkedmoney.data.local.RetrievedPreference
+import com.danilatyukov.linkedmoney.data.local.SavedPreference
+import com.danilatyukov.linkedmoney.data.remote.FDatabaseWriter
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -70,16 +73,19 @@ class LoginActivity : BaseActivity() {
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                SavedPreference.setEmail(account.email.toString())
-                SavedPreference.setUsername(account.displayName.toString())
-
-                RetrievedPreference.getEmail()
-
+                registered(account)
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
             }
         }
+    }
+
+    private fun registered(account: GoogleSignInAccount){
+        SavedPreference.setEmail(account.email.toString())
+        SavedPreference.setUsername(account.displayName.toString())
+        FirebaseAuth.getInstance().currentUser?.let { SavedPreference.setUid(it.uid) }
+        FDatabaseWriter.registrationUser(RetrievedPreference.getUid(), account.displayName.toString(), account.email.toString())
     }
 
     override fun onStart() {

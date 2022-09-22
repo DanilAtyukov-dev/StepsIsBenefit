@@ -1,6 +1,6 @@
-package com.danilatyukov.linkedmoney.ui.pedometer.utils
+package com.danilatyukov.linkedmoney.model.pedometer.utils
 
-import com.danilatyukov.linkedmoney.ui.pedometer.listener.StepListener
+import com.danilatyukov.linkedmoney.model.pedometer.listener.StepListener
 
 /**
  * Created by Govind on 05/25/2018.

@@ -1,4 +1,4 @@
-package com.danilatyukov.linkedmoney.data
+package com.danilatyukov.linkedmoney.data.local
 
 
 import com.danilatyukov.linkedmoney.App
@@ -15,6 +15,12 @@ class RetrievedPreference {
         }
         fun getUsername(): String{
             return appComponent.sp.getString("username", "unauthorized").toString()
+        }
+        fun getUid(): String{
+            return appComponent.sp.getString("uid", "unauthorized").toString()
+        }
+        fun getAds(): Int{
+            return appComponent.sp.getInt("ads", 0)
         }
     }
 }

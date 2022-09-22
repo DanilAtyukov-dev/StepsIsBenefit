@@ -1,4 +1,4 @@
-package com.danilatyukov.linkedmoney.ui.pedometer
+package com.danilatyukov.linkedmoney.ui.dashboard.pedometer
 
 
 import android.os.Bundle
@@ -12,7 +12,7 @@ import com.danilatyukov.linkedmoney.databinding.FragmentPedometerBinding
 
 class PedometerFragment : Fragment() {
 
-   /* companion object {
+    /* companion object {
         fun newInstance() = PedometerFragment()
     }*/
 

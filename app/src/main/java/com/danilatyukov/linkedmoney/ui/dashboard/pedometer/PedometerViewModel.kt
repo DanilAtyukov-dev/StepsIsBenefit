@@ -1,4 +1,4 @@
-package com.danilatyukov.linkedmoney.ui.pedometer
+package com.danilatyukov.linkedmoney.ui.dashboard.pedometer
 
 import android.content.Context
 import android.hardware.Sensor
@@ -10,8 +10,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.danilatyukov.linkedmoney.App
 import com.danilatyukov.linkedmoney.appContext
-import com.danilatyukov.linkedmoney.ui.pedometer.listener.StepListener
-import com.danilatyukov.linkedmoney.ui.pedometer.utils.StepDetector
+import com.danilatyukov.linkedmoney.data.remote.FDatabaseWriter
+import com.danilatyukov.linkedmoney.model.pedometer.listener.StepListener
+import com.danilatyukov.linkedmoney.model.pedometer.utils.StepDetector
 
 class PedometerViewModel : ViewModel(), SensorEventListener, StepListener{
     // TODO: Implement the ViewModel
@@ -44,6 +45,7 @@ class PedometerViewModel : ViewModel(), SensorEventListener, StepListener{
     override fun step(timeNs: Long) {
         numSteps++
         _counter.value = textNumSteps.plus(numSteps)
+        FDatabaseWriter.writeSteps(1)
     }
 
     fun play(){

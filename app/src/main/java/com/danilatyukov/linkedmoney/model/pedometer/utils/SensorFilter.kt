@@ -1,4 +1,4 @@
-package com.danilatyukov.linkedmoney.ui.pedometer.utils
+package com.danilatyukov.linkedmoney.model.pedometer.utils
 
 /**
  * Created by Govind on 05/25/2018.

@@ -3,7 +3,7 @@ package com.danilatyukov.linkedmoney
 import android.os.Bundle
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.danilatyukov.linkedmoney.data.RetrievedPreference
+import com.danilatyukov.linkedmoney.data.local.RetrievedPreference
 import com.danilatyukov.linkedmoney.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
