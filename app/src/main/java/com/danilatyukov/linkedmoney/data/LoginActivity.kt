@@ -7,8 +7,8 @@ import com.danilatyukov.linkedmoney.BaseActivity
 import com.danilatyukov.linkedmoney.MainActivity
 import com.danilatyukov.linkedmoney.R
 import com.danilatyukov.linkedmoney.appComponent
-import com.danilatyukov.linkedmoney.data.local.RetrievedPreference
-import com.danilatyukov.linkedmoney.data.local.SavedPreference
+import com.danilatyukov.linkedmoney.data.local.preferences.RetrievedPreference
+import com.danilatyukov.linkedmoney.data.local.preferences.SavedPreference
 import com.danilatyukov.linkedmoney.data.remote.FDatabaseWriter
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -32,7 +32,7 @@ class LoginActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login2)
-        appComponent.inject(this)
+        appComponent.injectLoginActivity(this)
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 

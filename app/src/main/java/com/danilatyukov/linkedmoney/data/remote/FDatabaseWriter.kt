@@ -2,7 +2,7 @@ package com.danilatyukov.linkedmoney.data.remote
 
 import com.danilatyukov.linkedmoney.App
 import com.danilatyukov.linkedmoney.appComponent
-import com.danilatyukov.linkedmoney.data.local.RetrievedPreference
+import com.danilatyukov.linkedmoney.data.local.preferences.RetrievedPreference
 import com.google.firebase.database.ServerValue
 
 
@@ -17,6 +17,7 @@ class FDatabaseWriter() {
             )
             App.it().appComponent.fDatabaseReference.updateChildren(updates)
         }
+
         fun registrationUser(userId: String, name: String, email: String) {
             val childUpdates = hashMapOf<String, Any>(
                 "users/$userId/username" to name,
