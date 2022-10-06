@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "1057688487162",
+    "firebase_url": "https://linkedmoney-c8216-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "linkedmoney-c8216",
     "storage_bucket": "linkedmoney-c8216.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1057688487162-52vj0gr7ae6os0q6h2qvtoo54i0q46hd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.danilatyukov.linkedmoney",
+            "certificate_hash": "2a19a96e46528972370d93114718d6356c8ce64f"
+          }
+        },
         {
           "client_id": "1057688487162-rr4ferhtqmde4a25rul1sj3belquctlp.apps.googleusercontent.com",
           "client_type": 3

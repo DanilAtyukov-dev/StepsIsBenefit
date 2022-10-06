@@ -1,6 +1,10 @@
 <resources>
-    <string name="app_name">LinkedMoney</string>
+    <string name="app_name">BoM</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="copyRefLink"><u>Реферальная ссылка</u></string>
+    <string name="privacy">Я принимаю условия <u>пользовательского соглашения</u> и <u>политики конфиденциальности</u></string>
 </resources>

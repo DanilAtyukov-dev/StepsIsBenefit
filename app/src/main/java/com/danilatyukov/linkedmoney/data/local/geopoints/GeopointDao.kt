@@ -14,6 +14,9 @@ interface GeopointDao {
 
     @Delete
     fun delete(geopointEntity: GeopointEntity)
+
+    @Query("DELETE FROM Geopoints")
+    fun deleteAll()
 }
 
 @Entity(tableName = "Geopoints")

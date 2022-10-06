@@ -31,13 +31,6 @@
             android:orientation="vertical"
             android:layout_marginTop="100dp">
 
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:src="@drawable/ic_dashboard_black_24dp" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -46,13 +39,22 @@
                 android:textAlignment="center"
                 android:textSize="32sp" />
 
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                app:srcCompat="@drawable/common_google_signin_btn_icon_dark_focused" />
+
             <androidx.cardview.widget.CardView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="30dp"
                 android:layout_gravity="center"
-                android:layout_margin="50dp"
+                android:layout_marginHorizontal="50dp"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="20dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:id="@+id/Signin">
@@ -67,7 +69,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_gravity="start"
-                        android:src="@drawable/ic_launcher_background"
+                        android:src="@drawable/googleg_standard_color_18"
                         android:layout_marginEnd="5dp"/>
 
                     <TextView
@@ -82,6 +84,16 @@
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/policy"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_marginHorizontal="50dp"
+                android:fontFamily="@font/bold"
+                android:layout_height="wrap_content"
+                android:text="@string/privacy" />
 
         </LinearLayout>
 

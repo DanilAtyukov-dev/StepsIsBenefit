@@ -11,14 +11,18 @@ import androidx.preference.PreferenceManager
 import com.danilatyukov.linkedmoney.App
 import com.danilatyukov.linkedmoney.R
 import com.danilatyukov.linkedmoney.appComponent
-import com.danilatyukov.linkedmoney.data.remote.FDatabaseWriter
 import com.danilatyukov.linkedmoney.databinding.FragmentWorldMapBinding
-import com.danilatyukov.linkedmoney.model.GeopointInfoWindow
+import com.danilatyukov.linkedmoney.model.geolocation.GeopointInfoWindow
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapController
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
+
+
+
 
 var currentLocationMarker: Marker? = null
 
@@ -26,7 +30,11 @@ class WorldMapFragment : Fragment() {
     private lateinit var _binding: FragmentWorldMapBinding
     private val binding get() = _binding
 
+    var currentLocation: GeoPoint? = null
+
     private lateinit var viewModel: WorldMapViewModel
+
+    val markers = ArrayList<Marker>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,29 +45,52 @@ class WorldMapFragment : Fragment() {
         initializationMap()
 
         val worldMapViewModel = ViewModelProvider(this)[WorldMapViewModel::class.java]
-        worldMapViewModel.points.observe(viewLifecycleOwner) {
+
+        _binding.mapCenter.setOnClickListener{setMapCenter()}
+        _binding.zoomOut.setOnClickListener{mapController.zoomOut()}
+        _binding.zoomIn.setOnClickListener{mapController.zoomIn()}
+
+
+        worldMapViewModel.points.observe(viewLifecycleOwner) { it ->
             if (it.isEmpty()) return@observe
 
-            val currentLocation = GeoPoint(it.last().latitude, it.last().longitude)
+            currentLocation = GeoPoint(it.last().latitude, it.last().longitude)
             val currentSpeed = it.last().speed
             val currentAccuracy = it.last().accuracy
             val currentGeopointEntity = it.last()
 
-            mapController.setCenter(currentLocation)
-            setCurrentMarker(currentLocation)
 
-            it.removeLast()
+
+            setMapCenter()
 
             it.forEach {
                 setWereMarker(it.latitude, it.longitude, it.time, it.speed.toString(), it.accuracy)
             }
 
+            setCurrentMarker(currentLocation!!)
+
+            //it.removeLast()
             _binding.worldMapView.invalidate()
+
+            _binding.clearedMap.setOnClickListener {
+                markers.forEach{
+                    it.remove(_binding.worldMapView)
+
+                }
+                Thread{
+                    App.it().appComponent.geopointDao.deleteAll()
+                }.start()
+
+            }
         }
 
         return root
     }
 
+    private fun setMapCenter(){
+        mapController.setCenter(currentLocation)
+        mapController.setZoom(16.0)
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -73,6 +104,7 @@ class WorldMapFragment : Fragment() {
                 requireActivity(),
                 PreferenceManager.getDefaultSharedPreferences(requireContext())
             )
+
             mapController = _binding.worldMapView.controller as MapController
             //mapController.setCenter(GeoPoint(UserData.latitude, UserData.longitude))
             _binding.worldMapView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
@@ -81,26 +113,38 @@ class WorldMapFragment : Fragment() {
             mapController.setZoom(16.0)
             _binding.worldMapView.maxZoomLevel = 18.2
             _binding.worldMapView.minZoomLevel = 3.0
+            _binding.worldMapView.setBuiltInZoomControls(false)
 
-            //setMarker(0.0, 0.0, "0", "0")
+            val mRotationGestureOverlay = RotationGestureOverlay(_binding.worldMapView)
+            mRotationGestureOverlay.isEnabled = true
+            _binding.worldMapView.setMultiTouchControls(true)
+            _binding.worldMapView.overlays.add(mRotationGestureOverlay)
         } catch (e: Exception) {
-            e.printStackTrace()
+            FirebaseCrashlytics.getInstance().recordException(e)
         }
     }
 
     private fun setWereMarker(latitude: Double, longitude: Double, time: String, speed: String, accuracy: Float) {
-
-
         val myMarker = Marker(_binding.worldMapView)
-        myMarker.icon = ContextCompat.getDrawable(requireActivity(), R.drawable.record)
+        myMarker.icon = ContextCompat.getDrawable(requireActivity(), R.drawable.ic_locationpointer_violet_24dp)
+        //myMarker.icon = (ContextCompat.getDrawable(requireActivity(), org.osmdroid.library.R.drawable.osm_ic_follow_me));
+
         myMarker.position = GeoPoint(latitude, longitude)
-        myMarker.infoWindow = GeopointInfoWindow(_binding.worldMapView, time, speed.plus("\n acc $accuracy"), )
+        myMarker.infoWindow = GeopointInfoWindow(
+            _binding.worldMapView,
+            time,
+            speed.plus("\n acc $accuracy")
+        )
         _binding.worldMapView.overlays.add(myMarker)
 
     }
 
+
+
     private fun setCurrentMarker(geoPoint: GeoPoint) {
         val myMarker = Marker(_binding.worldMapView)
+        markers.add(myMarker)
+
         myMarker.icon = ContextCompat.getDrawable(requireActivity(), R.drawable.ic_location_pin)
         myMarker.position = GeoPoint(geoPoint.latitude, geoPoint.longitude)
         _binding.worldMapView.overlays.add(myMarker)

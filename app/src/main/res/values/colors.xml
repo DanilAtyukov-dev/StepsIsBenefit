@@ -8,4 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="turquoise_blue">#77dde7</color>
+    <color name="text">#2b003d</color>
+
+    <color name="navigation">#ffa500</color>
+    <color name="nav_text">#ffa500</color>
+
+
 </resources>

@@ -33,6 +33,8 @@ class MainActivity : BaseActivity() {
 
         navView.setupWithNavController(navController)
         showToast("${RetrievedPreference.getEmail()}, ${RetrievedPreference.getUsername()}")
+
+        appComponent.fDatabaseReader
     }
 
 

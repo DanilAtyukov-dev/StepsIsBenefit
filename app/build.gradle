@@ -4,26 +4,44 @@ plugins {
     id 'com.google.gms.google-services'
     id 'kotlin-kapt'
     id 'kotlin-android-extensions'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('C:\\Users\\atyuk\\AndroidStudioProjects\\LinkedMoney\\KeystoreLinkedMoney.jks')
+            storePassword 'Sv2114'
+            keyAlias 'key0'
+            keyPassword 'Sv2114'
+        }
+        release {
+        storeFile file('C:\\Users\\atyuk\\AndroidStudioProjects\\LinkedMoney\\KeystoreLinkedMoney.jks')
+            storePassword 'sv2114'
+            keyAlias 'key0'
+            keyPassword 'sv2114'
+        }
+    }
     compileSdk 32
 
     defaultConfig {
         applicationId "com.danilatyukov.linkedmoney"
         minSdk 21
         targetSdk 32
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "3.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.debug
     }
-
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            debuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -42,6 +60,9 @@ dependencies {
 
     //androidx.preference.PreferenceManager предоставляющий userAgent OSM
     implementation 'androidx.preference:preference:1.2.0'
+    implementation 'com.android.installreferrer:installreferrer:2.2'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx:18.2.13'
+    implementation 'com.google.firebase:firebase-analytics-ktx:21.1.1'
 
     //room
     def room_version = "2.4.0"

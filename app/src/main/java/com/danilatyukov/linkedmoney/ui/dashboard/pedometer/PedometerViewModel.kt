@@ -1,59 +1,87 @@
 package com.danilatyukov.linkedmoney.ui.dashboard.pedometer
 
-import android.content.Context
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
+import android.content.Intent
+import android.content.SharedPreferences
+import android.view.Gravity
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.danilatyukov.linkedmoney.App
+import com.danilatyukov.linkedmoney.appComponent
 import com.danilatyukov.linkedmoney.appContext
+import com.danilatyukov.linkedmoney.data.local.preferences.RetrievedPreference
+import com.danilatyukov.linkedmoney.data.local.preferences.SavedPreference
 import com.danilatyukov.linkedmoney.data.remote.FDatabaseWriter
-import com.danilatyukov.linkedmoney.model.pedometer.listener.StepListener
-import com.danilatyukov.linkedmoney.model.pedometer.utils.StepDetector
+import com.danilatyukov.linkedmoney.model.ForegroundService
+import com.google.android.gms.tasks.OnCompleteListener
+import java.text.DecimalFormat
 
-class PedometerViewModel : ViewModel(), SensorEventListener, StepListener{
-    // TODO: Implement the ViewModel
-    private var simpleStepDetector: StepDetector? = null
-    private var sensorManager: SensorManager? = null
-    private val textNumSteps = "Steps: "
-    private var numSteps: Int = 0
-
-    init {
-        // Get an instance of the SensorManager
-        sensorManager = App.it().appContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        simpleStepDetector = StepDetector()
-        simpleStepDetector!!.registerListener(this)
-    }
+class PedometerViewModel : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val _counter = MutableLiveData<String>().apply {
-        value = "number of steps"
+        value = RetrievedPreference.getCurrentSteps().toString()
     }
     val counter: LiveData<String> = _counter
 
-    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
+
+    private val _distance = MutableLiveData<String>().apply {
+        value = App.roundFloat(RetrievedPreference.getDistanceGPS() / 1000, "#.#").toString()
+
+    }
+    val distance: LiveData<String> = _distance
+
+
+    // TODO: Implement the ViewModel
+    private var numSteps: Int = 0
+    private var distanceCounter: Float = 0f
+
+    private lateinit var listener: SharedPreferences.OnSharedPreferenceChangeListener
+
+    init {
+        App.it().appComponent.sp.registerOnSharedPreferenceChangeListener(this)
     }
 
-    override fun onSensorChanged(event: SensorEvent?) {
-        if (event!!.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-            simpleStepDetector!!.updateAccelerometer(event.timestamp, event.values[0], event.values[1], event.values[2])
-        }
+    override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
+        numSteps = p0!!.getInt("steps", 0)
+        _counter.value = numSteps.toString()
+
+        distanceCounter = p0!!.getFloat("distanceGPS", 0f)
+        _distance.value = App.roundFloat(distanceCounter/1000, "#.#").toString()
     }
 
-    override fun step(timeNs: Long) {
-        numSteps++
-        _counter.value = textNumSteps.plus(numSteps)
-        FDatabaseWriter.writeSteps(1)
+    fun stepsSaved() {
+       val task = FDatabaseWriter.writeSteps(numSteps.toLong())
+        task.addOnCompleteListener(OnCompleteListener {
+            if (it.isSuccessful) {
+                App.it().appComponent.editor.putInt("steps", 0).apply()
+                App.it().appComponent.editor.putFloat("distanceGPS", 0f).apply()
+
+                numSteps = 0
+                _counter.value = numSteps.toString()
+
+                val toast = Toast.makeText(App.it().appContext, "SUCCESSFUL", Toast.LENGTH_SHORT)
+
+                toast.setGravity(Gravity.CENTER, 0, 0)
+                toast.show()
+
+
+                val serviceIntent = Intent(App.it().appContext, ForegroundService::class.java)
+                App.it().appContext.stopService(serviceIntent)
+
+            } else println("не сохранены")
+
+        })
     }
 
-    fun play(){
-        numSteps = 0
-        sensorManager!!.registerListener(this, sensorManager!!.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST)
+
+
+    override fun onCleared() {
+        super.onCleared()
+        //unregisterListener()
     }
 
-    fun stop(){
-        sensorManager!!.unregisterListener(this)
+    fun unregisterListener() {
+        App.it().appComponent.sp.unregisterOnSharedPreferenceChangeListener(listener)
     }
 }

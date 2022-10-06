@@ -1,7 +1,12 @@
 package com.danilatyukov.linkedmoney.data
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.text.Html
+import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
+import android.widget.TextView
 import androidx.cardview.widget.CardView
 import com.danilatyukov.linkedmoney.BaseActivity
 import com.danilatyukov.linkedmoney.MainActivity
@@ -10,6 +15,7 @@ import com.danilatyukov.linkedmoney.appComponent
 import com.danilatyukov.linkedmoney.data.local.preferences.RetrievedPreference
 import com.danilatyukov.linkedmoney.data.local.preferences.SavedPreference
 import com.danilatyukov.linkedmoney.data.remote.FDatabaseWriter
+import com.danilatyukov.linkedmoney.model.ReferralProgram
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -22,7 +28,9 @@ import javax.inject.Inject
 
 class LoginActivity : BaseActivity() {
 
+
     private lateinit var mGoogleSignInClient: GoogleSignInClient
+
     private val rcSignIn: Int = 516414
     private var firebaseAuth = FirebaseAuth.getInstance()
 
@@ -34,15 +42,23 @@ class LoginActivity : BaseActivity() {
         setContentView(R.layout.activity_login2)
         appComponent.injectLoginActivity(this)
 
+        val policyTV = findViewById<TextView>(R.id.policy)
+        policyTV.setOnClickListener{
+            val i = Intent(Intent.ACTION_VIEW, Uri.parse("https://vk.com/@-216264240-privacy-policy-and-terms-of-service"))
+            startActivity(i)
+        }
+
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
         firebaseAuth = FirebaseAuth.getInstance()
+
 
         findViewById<CardView>(R.id.Signin)
             .setOnClickListener {
                 signInGoogle()
             }
     }
+
     private fun signInGoogle() {
         val signInIntent: Intent = mGoogleSignInClient.signInIntent
         startActivityForResult(signInIntent, rcSignIn)
@@ -86,6 +102,8 @@ class LoginActivity : BaseActivity() {
         SavedPreference.setUsername(account.displayName.toString())
         FirebaseAuth.getInstance().currentUser?.let { SavedPreference.setUid(it.uid) }
         FDatabaseWriter.registrationUser(RetrievedPreference.getUid(), account.displayName.toString(), account.email.toString())
+
+        ReferralProgram(this)
     }
 
     override fun onStart() {
