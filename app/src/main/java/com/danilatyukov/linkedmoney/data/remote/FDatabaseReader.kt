@@ -3,6 +3,7 @@ package com.danilatyukov.linkedmoney.data.remote
 import android.util.Log
 import com.danilatyukov.linkedmoney.App
 import com.danilatyukov.linkedmoney.appComponent
+import com.danilatyukov.linkedmoney.appContext
 import com.danilatyukov.linkedmoney.data.local.preferences.RetrievedPreference
 import com.danilatyukov.linkedmoney.data.local.preferences.SavedPreference
 import com.google.firebase.database.DataSnapshot
@@ -12,6 +13,7 @@ import java.lang.NullPointerException
 
 class FDatabaseReader() {
     init {
+        appVersionListener()
         soprListener()
         krvListener()
         confirmStepsListener()
@@ -19,6 +21,7 @@ class FDatabaseReader() {
         writtenRefBonusListener()
         referralsNumberListener()
         referralsBonusListener()
+        kaListener()
     }
 
     private fun soprListener() {
@@ -48,6 +51,48 @@ class FDatabaseReader() {
                 // Get Post object and use the values to update the UI
                 if (dataSnapshot.value !is Long || dataSnapshot.value == null) return
                     SavedPreference.setKrv((dataSnapshot.value as Long).toInt())
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w("ScoresVM", "loadPost:onCancelled", databaseError.toException())
+            }
+        }
+        stepsReference.addValueEventListener(stepPriceListener)
+    }
+
+    private fun kaListener() {
+        val stepsReference =
+            App.it().appComponent.firebaseInstance.getReference("config").child("ka")
+        val stepPriceListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+                if (dataSnapshot.value !is Long || dataSnapshot.value == null) return
+                SavedPreference.setKa((dataSnapshot.value as Long).toInt())
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w("ScoresVM", "loadPost:onCancelled", databaseError.toException())
+            }
+        }
+        stepsReference.addValueEventListener(stepPriceListener)
+    }
+
+    private fun appVersionListener() {
+        val stepsReference =
+            App.it().appComponent.firebaseInstance.getReference("config").child("appVersion")
+        val stepPriceListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+                if (dataSnapshot.value !is Long || dataSnapshot.value == null) return
+
+                if(dataSnapshot.value != App.version){
+                    App.it().mainActivity?.lockInterface()
+                }
+
 
             }
 

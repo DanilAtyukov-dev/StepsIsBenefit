@@ -116,5 +116,27 @@ class SavedPreference {
             editor.apply()
             editor.commit()
         }
+
+        fun setKa(ka: Int) {
+            editor.putInt("ka", ka)
+            editor.apply()
+            editor.commit()
+        }
+
+        fun incrementSavedSteps(number: Int) {
+
+                val last = RetrievedPreference.Companion.getSavedSteps()
+
+                editor.putInt("savedSteps", number+last)
+                editor.apply()
+                editor.commit()
+
+        }
+
+        fun clearSavedSteps(){
+            editor.putInt("savedSteps", 0)
+            editor.apply()
+            editor.commit()
+        }
     }
 }

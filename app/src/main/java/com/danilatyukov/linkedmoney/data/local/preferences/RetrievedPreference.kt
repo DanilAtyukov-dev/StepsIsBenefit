@@ -81,5 +81,13 @@ class RetrievedPreference {
         fun getRefNum(): Int {
             return sp.getInt("referrals", 0)
         }
+
+        fun getka(): Int {
+            return sp.getInt("ka", 30)
+        }
+
+        fun getSavedSteps(): Int {
+            return sp.getInt("savedSteps", 0)
+        }
     }
 }
