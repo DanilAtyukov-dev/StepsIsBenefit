@@ -1,21 +1,20 @@
 package com.danilatyukov.linkedmoney
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.danilatyukov.linkedmoney.data.local.preferences.RetrievedPreference
 import com.danilatyukov.linkedmoney.databinding.ActivityMainBinding
+import com.danilatyukov.linkedmoney.ui.InfoDialogFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.my.target.ads.InterstitialAd
+import java.util.*
 
 
 class MainActivity : BaseActivity() {
@@ -27,6 +26,7 @@ class MainActivity : BaseActivity() {
 
         App.it().mainActivity = this
 
+
         amb = ActivityMainBinding.inflate(layoutInflater)
         setContentView(amb.root)
 
@@ -34,11 +34,82 @@ class MainActivity : BaseActivity() {
 
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
 
-        geolocationRequest()
-        navView.setupWithNavController(navController)
-        showToast("${RetrievedPreference.getEmail()}, ${RetrievedPreference.getUsername()}")
 
-        appComponent.fDatabaseReader
+        navView.setupWithNavController(navController)
+        showToast("${appComponent.appPreferences.userDetails.email}, ")
+
+        if(!appComponent.rememberMePreference.policyIsShown){
+            App.it().vibratePhone()
+            appComponent.rememberMePreference.policyShown()
+            InfoDialogFragment(
+                "Уведомление",
+                getText(R.string.privacy).toString(),
+                R.drawable.policy, policy = true
+            ).show(supportFragmentManager, "info")
+        } else (
+                initAd()
+        )
+    }
+    val tag = "MAIN ACTIVITY"
+
+    private var ad: InterstitialAd? = null
+
+    override fun onResume() {
+        super.onResume()
+
+        Timer().schedule(
+            object : TimerTask() {
+                override fun run() {
+                    showAdMaybe()
+                }
+            },
+            1000
+        )
+    }
+    fun showAdMaybe(){
+        if((1..3).shuffled().last() == 3){
+            showAd()
+        }
+    }
+
+    fun showAd(){
+        ad!!.show()
+        ad!!.load()
+    }
+
+    private fun initAd() {
+        // Создаем экземпляр InterstitialAd
+        ad = InterstitialAd(1141728, this)
+        // Устанавливаем слушатель событий
+        ad!!.setListener(object : InterstitialAd.InterstitialAdListener {
+            override fun onLoad(ad: InterstitialAd) {
+                // Запускаем показ
+                // в отдельном Activity
+                showAdMaybe()
+                App.it().appComponent.appPreferences.changeAdLoaded(true)
+
+            }
+            override fun onNoAd(reason: String, ad: InterstitialAd) {
+                Log.i(tag, "onNoAd")
+            }
+            override fun onClick(ad: InterstitialAd) {
+                Log.i(tag, "onClick")
+            }
+            override fun onDisplay(ad: InterstitialAd) {
+                Log.i(tag, "onDisplay")
+                appComponent.appPreferences.incCurrentAds(1)
+                appComponent.statisticInteractor.create(App.it().appComponent.appPreferences.currentSteps)
+            }
+            override fun onDismiss(ad: InterstitialAd) {
+                Log.i(tag, "onDismiss")
+            }
+            override fun onVideoCompleted(ad: InterstitialAd) {
+                Log.i(tag, "onVideoCompleted")
+            }
+        })
+
+        // Запускаем загрузку данных
+        ad!!.load()
     }
 
     fun lockInterface(){

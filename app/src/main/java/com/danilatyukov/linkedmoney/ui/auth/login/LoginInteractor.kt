@@ -1,18 +1,23 @@
 package com.danilatyukov.linkedmoney.ui.login
 
+import com.danilatyukov.linkedmoney.App
+import com.danilatyukov.linkedmoney.appComponent
 import com.danilatyukov.linkedmoney.data.local.preferences.AppPreferences
 import com.danilatyukov.linkedmoney.data.remote.request.UserRequestObject
+import com.danilatyukov.linkedmoney.data.vo.Credentials
 import com.danilatyukov.linkedmoney.data.vo.UserVO
 import com.danilatyukov.linkedmoney.service.MessageApiService
 import com.danilatyukov.linkedmoney.ui.auth.AuthInteractor
+import com.danilatyukov.linkedmoney.utils.CredentialsValidator
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_auth.*
 
 
 interface LoginInteractor : AuthInteractor {
     interface OnDetailsRetrievalFinishedListener {
         fun onDetailsRetrievalSuccess()
-        fun onDetailsRetrievalError()
+        fun onDetailsRetrievalError(message: String)
     }
     fun login(username: String, password: String, listener: AuthInteractor.onAuthFinishedListener)
     fun retrieveDetails(preferences: AppPreferences, listener: OnDetailsRetrievalFinishedListener)
@@ -29,12 +34,21 @@ class LoginInteractorImpl : LoginInteractor {
     private val service: MessageApiService = MessageApiService.getInstance()
 
    override fun login(username: String, password: String, listener: AuthInteractor.onAuthFinishedListener) {
-        when {
-            username.isBlank() -> listener.onUsernameError()
-            password.isBlank() -> listener.onPasswordError()
+
+
+       val passValidRes = CredentialsValidator.isPasswordValid(password)
+       when {
+           !CredentialsValidator.isEmailValid(username) -> listener.onUsernameError()
+           passValidRes != "ok" -> listener.onPasswordError(passValidRes)
+
+
             else -> {
+
                 submittedUsername = username
                 submittedPassword = password
+
+                App.it().appComponent.rememberMePreference.storeCredentials(Credentials(submittedUsername, submittedPassword))
+
                 val requestObject = UserRequestObject(username, password)
 
                 service.login(requestObject)
@@ -45,12 +59,11 @@ class LoginInteractorImpl : LoginInteractor {
                             accessToken = res.headers()["Authorization"] as String
                             listener.onAuthSuccess()
                         } else {
-                            listener.onAuthError()
-                            println("Code ${res.code()}, message ${res.message()}")
+                            listener.onAuthError(res.message())
                         }
                     }, { error ->
                         println("error")
-                        listener.onAuthError()
+                        listener.onAuthError(error.message!!)
                         error.printStackTrace()
                     })
             }
@@ -69,10 +82,13 @@ class LoginInteractorImpl : LoginInteractor {
                 listener.onDetailsRetrievalSuccess()
 
             }, { error ->
-                listener.onDetailsRetrievalError()
+                println("error retrieveDetails")
+                listener.onDetailsRetrievalError(error.message!!)
                 error.printStackTrace()
             })
     }
+
+
 
     override fun persistAccessToken(preferences: AppPreferences) {
         preferences.storeAccessToken(accessToken)

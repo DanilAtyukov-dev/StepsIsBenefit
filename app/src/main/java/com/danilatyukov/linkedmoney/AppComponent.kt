@@ -9,14 +9,15 @@ import android.location.LocationManager
 import android.os.Build
 import androidx.room.Room
 import com.danilatyukov.linkedmoney.data.AppDatabase
-import com.danilatyukov.linkedmoney.data.LoginActivity
 import com.danilatyukov.linkedmoney.data.local.geopoints.GeopointDao
-import com.danilatyukov.linkedmoney.data.local.preferences.RetrievedPreference
-import com.danilatyukov.linkedmoney.data.local.preferences.SavedPreference
-import com.danilatyukov.linkedmoney.data.remote.FDatabaseReader
+import com.danilatyukov.linkedmoney.data.local.preferences.AppPreferences
+import com.danilatyukov.linkedmoney.data.local.preferences.RememberMePreference
+import com.danilatyukov.linkedmoney.data.local.preferences.ScoresPreferences
+import com.danilatyukov.linkedmoney.data.remote.interactors.StatisticInteractorImpl
 import com.danilatyukov.linkedmoney.model.ForegroundService
 import com.danilatyukov.linkedmoney.model.geolocation.GeolocationManager
 import com.danilatyukov.linkedmoney.model.pedometer.PedometerManager
+import com.danilatyukov.linkedmoney.networkListeners.StatisticListener
 
 
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -32,16 +33,9 @@ import javax.inject.Singleton
 
 
 @Singleton
-@Component(modules = [GoogleLoginModule::class, ContextModule::class, DatabaseModule::class, GeolocationManagerModule::class, PedometerModule::class, IntentsModule::class])
+@Component(modules = [SharedPreferencesModule::class ,RestModule::class, ContextModule::class, DatabaseModule::class, GeolocationManagerModule::class, PedometerModule::class, IntentsModule::class])
 interface AppComponent {
-    fun injectLoginActivity(activity: LoginActivity)
-    val gso: GoogleSignInOptions
 
-    fun injectSavedPreference(savedPreference: SavedPreference)
-    val editor: SharedPreferences.Editor
-
-    fun injectRetrievePreference(retrievePreference: RetrievedPreference)
-    val sp: SharedPreferences
 
     fun injectGeolocationManager(geolocationManager: GeolocationManager)
     val fusedLocationClient: FusedLocationProviderClient
@@ -53,14 +47,18 @@ interface AppComponent {
     val pedometerManager: PedometerManager
     val provideForegroundServicePendingIntent: PendingIntent
 
-    val fDatabaseReader: FDatabaseReader
 
     val notificationIntent: Intent
-    val fDatabaseReference: DatabaseReference
     val geopointDao: GeopointDao
     val appDatabase: AppDatabase
 
-    val firebaseInstance: FirebaseDatabase
+
+    val statisticInteractor: StatisticInteractorImpl
+
+    val statisticListener: StatisticListener
+
+    val appPreferences: AppPreferences
+    val rememberMePreference: RememberMePreference
 }
 
 @Module
@@ -94,7 +92,23 @@ object GeolocationManagerModule {
     }
 }
 
-@Module(includes = [FirebaseModule::class, SharedPreferencesModule::class])
+@Module
+object SharedPreferencesModule {
+    @Singleton
+    @Provides
+    fun provideAppPreferences(ctx: Context): AppPreferences {
+        return AppPreferences.create(ctx)
+    }
+
+    @Singleton
+    @Provides
+    fun provideRememberMePreferences(ctx: Context): RememberMePreference {
+        return RememberMePreference.create(ctx)
+    }
+
+}
+
+@Module
 object DatabaseModule {
     @Singleton
     @Provides
@@ -107,55 +121,27 @@ object DatabaseModule {
     fun provideGeopointDAO(appDatabase: AppDatabase): GeopointDao {
         return appDatabase.geopointDao()
     }
+
+
 }
 
 
-@Module
-object FirebaseModule {
-    @Singleton
-    @Provides
-    fun provideFDatabaseReference(firebaseInstance: FirebaseDatabase): DatabaseReference {
-        return firebaseInstance.reference
-    }
 
-    @Singleton
-    @Provides
-    fun provideFDatabaseInstance(): FirebaseDatabase{
-        return FirebaseDatabase.getInstance("https://linkedmoney-c8216-default-rtdb.asia-southeast1.firebasedatabase.app")
-    }
 
-    @Singleton
-    @Provides
-    fun provideFDatabaseReader(): FDatabaseReader{
-        return FDatabaseReader()
-    }
-}
 
 @Module
-object GoogleLoginModule {
+object RestModule {
     @Singleton
     @Provides
-    fun provideGoogleSignInOptions(context: Context): GoogleSignInOptions {
-        return GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(context.getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
+    fun provideStatisticInteractor(appPreferences: AppPreferences, statisticListener: StatisticListener): StatisticInteractorImpl{
+        return StatisticInteractorImpl(appPreferences, statisticListener)
     }
-}
-
-@Module
-object SharedPreferencesModule {
     @Singleton
     @Provides
-    fun provideSharedPreferences(ctx: Context): SharedPreferences {
-        return ctx.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    fun provideStatisticListener(): StatisticListener{
+        return StatisticListener()
     }
 
-    @Singleton
-    @Provides
-    fun provideSharedPreferencesEditor(sp: SharedPreferences): SharedPreferences.Editor {
-        return sp.edit()
-    }
 }
 
 @Module

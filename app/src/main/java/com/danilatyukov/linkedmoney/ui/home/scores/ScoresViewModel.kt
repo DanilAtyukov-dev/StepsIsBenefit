@@ -2,13 +2,14 @@ package com.danilatyukov.linkedmoney.ui.home.scores
 
 import android.content.SharedPreferences
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.danilatyukov.linkedmoney.App
 import com.danilatyukov.linkedmoney.appComponent
-import com.danilatyukov.linkedmoney.data.local.preferences.RetrievedPreference
-import com.danilatyukov.linkedmoney.data.local.preferences.SavedPreference
+import com.danilatyukov.linkedmoney.data.vo.UserVO
+
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -16,54 +17,47 @@ import java.math.BigDecimal
 
 class ScoresViewModel : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
     // TODO: Implement the ViewModel
+    lateinit var userDetails: UserVO
 
     init {
-        App.it().appComponent.sp.registerOnSharedPreferenceChangeListener(this)
-        /*setStepPriceListener()
-        setConfirmStepsListener()*/
+        App.it().appComponent.appPreferences.preferences.registerOnSharedPreferenceChangeListener(
+            this
+        )
+        userDetails = App.it().appComponent.appPreferences.userDetails
+
     }
+
     private val _confirmSteps = MutableLiveData<String>().apply {
-        value = RetrievedPreference.getConfirmSteps().toString()
+        value = userDetails.allSteps.toString()
     }
     val confirmSteps: LiveData<String> = _confirmSteps
 
-
-
-
     private val _allMoney = MutableLiveData<String>().apply {
-        value = App.getAllStepsPrice()
+        value = userDetails.allMoney.toString()
     }
     val allMoney: LiveData<String> = _allMoney
 
-    private val _allSteps = MutableLiveData<Int>().apply {
-        value = RetrievedPreference.getAllSteps()
-    }
-    val allSteps: LiveData<Int> = _allSteps
-
     private val _allGpsDistance = MutableLiveData<String>().apply {
-        //value = "9.3"
-        value = App.roundFloat(RetrievedPreference.getAllDistanceGPS()/1000, "#.#")
+        value = App.roundFloat(App.it().appComponent.appPreferences.allDistance / 1000, "#.#")
     }
     val allGpsDistance: LiveData<String> = _allGpsDistance
 
     private val _stepPrice = MutableLiveData<String>().apply {
-        value = App.getStepPrice(/*p0.getInt("confirmSteps", 0)*/ RetrievedPreference.getConfirmSteps(),  RetrievedPreference.getAds(), RetrievedPreference.getKrv(), RetrievedPreference.getSopr())
+        value = userDetails.stepCost.toString()
     }
     val stepPrice: LiveData<String> = _stepPrice
 
+    private val _adLoaded = MutableLiveData<Int>().apply {
+        value = View.GONE
+    }
+    val adLoaded: LiveData<Int> = _adLoaded
+
     override fun onSharedPreferenceChanged(p0: SharedPreferences?, p1: String?) {
         if (p0 == null) return
-        _allSteps.value = p0.getInt("allSteps", 0)
-        _allGpsDistance.value = App.roundFloat(p0.getFloat("AllDistanceGPS", 0f)/1000, "#.#")
-        _confirmSteps.value = p0.getInt("confirmSteps", 0).toString()
-
-
-        if(p1.equals("ads") || p1.equals("confirmSteps") || p1.equals("sopr") || p1.equals("krv")){
-        _stepPrice.value = App.getStepPrice(p0.getInt("confirmSteps", 0),  p0.getInt("ads", 0), p0.getInt("krv", 10), p0.getFloat("sopr", 0.01f))
-
-            /*SavedPreference.setStepPrice(_stepPrice.value!!)*/
-
-            _allMoney.value = App.getAllStepsPrice()
-        }
+        _allGpsDistance.value = App.roundFloat(p0.getFloat("ALL_DISTANCE", 0f) / 1000, "#.#")
+        _confirmSteps.value = p0.getLong("ALL_STEPS", 0).toString()
+        _stepPrice.value = p0.getFloat("STEP_COST", 0.0001f).toString()
+        _allMoney.value = p0.getFloat("ALL_MONEY", 0.0f).toString()
+         _adLoaded.value = p0.getInt("AD_LOADED", View.GONE)
     }
 }

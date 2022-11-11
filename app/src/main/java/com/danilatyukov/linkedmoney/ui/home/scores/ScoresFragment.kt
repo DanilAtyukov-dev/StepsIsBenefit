@@ -8,10 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import com.danilatyukov.linkedmoney.App
 import com.danilatyukov.linkedmoney.R
-import com.danilatyukov.linkedmoney.data.local.preferences.RetrievedPreference
+import com.danilatyukov.linkedmoney.appComponent
 import com.danilatyukov.linkedmoney.databinding.FragmentPedometerBinding
 import com.danilatyukov.linkedmoney.databinding.FragmentScoresBinding
 import com.danilatyukov.linkedmoney.ui.InfoDialogFragment
+import kotlinx.android.synthetic.main.fragment_scores.*
 import kotlinx.android.synthetic.main.fragment_scores.view.*
 
 class ScoresFragment : Fragment() {
@@ -44,6 +45,7 @@ class ScoresFragment : Fragment() {
 
 
 
+
         viewModel.stepPrice.observe(viewLifecycleOwner) {
             _binding.stepPriceTv.text = App.roundFloat(it.toFloat(), "#.#####").plus("р")
         }
@@ -51,17 +53,22 @@ class ScoresFragment : Fragment() {
             _binding.confirmStepsTv.text = it
         }
 
-        viewModel.allSteps.observe(viewLifecycleOwner) {
-            //_binding.allStepsTv.text = it.toString()
-        }
-
         viewModel.allMoney.observe(viewLifecycleOwner) {
-            _binding.balanceTv.text = App.roundFloat(it.toFloat()+RetrievedPreference.getRefBonus(), "#.#####").plus("р")
+            _binding.balanceTv.text = App.roundFloat(it.toFloat()/*+RetrievedPreference.getRefBonus() TODO */, "#.#####").plus("р")
         }
 
         viewModel.allGpsDistance.observe(viewLifecycleOwner) {
-
             _binding.allGpsDistanceTv.text = it.plus(" км")
+        }
+        viewModel.adLoaded.observe(viewLifecycleOwner){
+            _binding.showAdbtn.visibility = View.VISIBLE
+        }
+
+        showAdbtn.setOnClickListener{
+            App.it().mainActivity!!.showAd()
+            App.it().appComponent.appPreferences.changeAdLoaded(false)
+            /*App.it().appComponent.appPreferences.incCurrentAds(1)
+            App.it().appComponent.statisticInteractor.create(App.it().appComponent.appPreferences.currentSteps)*/
         }
 
         _binding.priceMyStepImg.setOnClickListener {
@@ -87,7 +94,7 @@ class ScoresFragment : Fragment() {
 
             App.it().vibratePhone()
 
-            val krv = RetrievedPreference.getKrv()
+            val krv = 10 /*RetrievedPreference.getKrv()*/ //TODO если всё-таки меняем параметр numberDefaultVip
             InfoDialogFragment(
                 "Информация",
                 "Вывод средств производится в соотношении $krv к 1, где ${krv}р - это Ваши средства, а 1р - это накопленный Реферальный бонус. Минимальная сумма вывода - 50р.",

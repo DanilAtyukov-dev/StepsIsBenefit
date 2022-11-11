@@ -1,4 +1,9 @@
 package com.danilatyukov.linkedmoney.data.vo
 
-class FlowStatVO {
-}
+data class FlowStatVO(
+    val id: Long,
+    val ownerId: Long,
+    val stats: ArrayList<StatisticVO>,
+    val date: String
+)
+

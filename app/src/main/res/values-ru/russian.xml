@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="privacy">Продолжая использовать приложение, условия вы принимаете <u>пользовательского соглашения</u> и <u>политики конфиденциальности</u></string>
+    <string name="geolocationNotificationText">Steps is Benefit собирает данные о местоположении для записи ваших маршрутов, даже когда приложение закрыто или не используется, чтобы показать их вам позже. Вы можете не включать эту функцию или отключить её позже в настройках устройства.</string>
+    <string name="geolocationNotificationPositive">разрешить</string>
+    <string name="geolocationNotificationNegative">запретить</string>
+    <string name="backgroundNotification">шагомер и геолокация активны</string>
+
+</resources>

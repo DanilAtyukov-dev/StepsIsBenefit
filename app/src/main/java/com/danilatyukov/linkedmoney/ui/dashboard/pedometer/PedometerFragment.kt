@@ -14,7 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.danilatyukov.linkedmoney.App
-import com.danilatyukov.linkedmoney.data.local.preferences.RetrievedPreference
 import com.danilatyukov.linkedmoney.databinding.FragmentPedometerBinding
 import com.danilatyukov.linkedmoney.model.ForegroundService
 
@@ -76,10 +75,12 @@ class PedometerFragment : Fragment() {
         if (btnState=="active"){
             _binding.pedometerButton.tag = "stopped"
             _binding.pedometerButton.text = "Начать"
-            viewModel.stepsSaved()
+            viewModel.stop()
             //activity?.stopService(serviceIntent)
         }
-        else if(btnState=="stopped"){
+        else if(btnState=="stopped") {
+
+
             _binding.pedometerButton.tag = "active"
             _binding.pedometerButton.text = "Сохранить"
             ContextCompat.startForegroundService(requireContext(), serviceIntent)
@@ -100,4 +101,6 @@ class PedometerFragment : Fragment() {
         }
         return false
     }
+
+
 }

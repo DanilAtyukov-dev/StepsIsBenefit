@@ -6,5 +6,10 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="copyRefLink"><u>Реферальная ссылка</u></string>
-    <string name="privacy">Я принимаю условия <u>пользовательского соглашения</u> и <u>политики конфиденциальности</u></string>
+    <string name="privacy">By continuing to use the app, you agree to <u>user agreement</u> and <u>privacy policies</u></string>
+    <string name="geolocationNotificationText">Steps is Benefit collects location data to record your routes, even when the app is closed or not in use, to show them to you later. You can choose not to enable this feature or disable it later in the device settings.</string>
+    <string name="geolocationNotificationPositive">Allow</string>
+    <string name="geolocationNotificationNegative">Ban</string>
+    <string name="backgroundNotification">pedometer and geolocation active</string>
+
 </resources>

@@ -36,8 +36,7 @@ class ForegroundService : Service() {
         App.it().appComponent.injectForegroundService(this)
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("STEPS IS BENEFIT")
-            .setContentText("Местоположение и шаги записываются в фоновом режиме")
+            .setContentText(App.it().getText(R.string.backgroundNotification))
             .setSmallIcon(R.drawable.notify_logo)
             .setContentIntent(foregroundServicePendingIntent)
             .build()

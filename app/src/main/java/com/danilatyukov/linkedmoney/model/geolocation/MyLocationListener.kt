@@ -8,7 +8,6 @@ import com.danilatyukov.linkedmoney.App
 import com.danilatyukov.linkedmoney.appComponent
 import com.danilatyukov.linkedmoney.data.local.geopoints.GeopointDao
 import com.danilatyukov.linkedmoney.data.local.geopoints.GeopointEntity
-import com.danilatyukov.linkedmoney.data.local.preferences.SavedPreference
 import kotlin.math.roundToInt
 
 class MyLocationListener: LocationListener {
@@ -50,8 +49,9 @@ class MyLocationListener: LocationListener {
 
     private fun distance(location: Location) {
         val distance = lastLocation?.distanceTo(location)
-        distance?.let { SavedPreference.incrementDistanceGPS(it) }
-        distance?.let { SavedPreference.incrementAllDistanceGPS(it) }
+
+        distance?.let {App.it().appComponent.appPreferences.incCurrentDistance(it)}
+        distance?.let {App.it().appComponent.appPreferences.incAllDistance(it)}
     }
 
     override fun onProviderDisabled(provider: String) {

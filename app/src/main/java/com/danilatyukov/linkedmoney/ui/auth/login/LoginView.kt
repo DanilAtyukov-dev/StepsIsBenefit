@@ -10,8 +10,10 @@ interface LoginView: BaseView, AuthView {
     fun showProgress()
     fun hideProgress()
     fun setEmailError()
-    fun setPasswordError()
+    fun setPasswordError(msg: String)
     fun navigateToSignUp()
     fun navigateToHome()
+    fun showInterface()
+    fun hideInterface()
 
 }

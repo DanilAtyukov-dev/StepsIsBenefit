@@ -6,10 +6,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import com.danilatyukov.linkedmoney.App
-import com.danilatyukov.linkedmoney.appComponent
 import com.danilatyukov.linkedmoney.appContext
-import com.danilatyukov.linkedmoney.data.local.preferences.SavedPreference
-import com.danilatyukov.linkedmoney.data.remote.FDatabaseWriter
 import com.danilatyukov.linkedmoney.model.pedometer.listener.StepListener
 import com.danilatyukov.linkedmoney.model.pedometer.utils.StepDetector
 
@@ -21,12 +18,10 @@ class PedometerManager: SensorEventListener, StepListener {
     private var simpleStepDetector: StepDetector? = null
     private var sensorManager: SensorManager? = null
     private var numSteps: Int = 0
-
+    private val preferences = App.it().appComponent.appPreferences
 
 
     init {
-        SavedPreference.clearSavedSteps()
-        // Get an instance of the SensorManager
         sensorManager = App.it().appContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         simpleStepDetector = StepDetector()
         simpleStepDetector!!.registerListener(this)
@@ -46,24 +41,22 @@ class PedometerManager: SensorEventListener, StepListener {
         }
     }
 
-    override fun step(timeNs: Long) {
 
-            SavedPreference.incrementAllSteps(1)
-        numSteps++
+    override fun step(timeNs: Long) {
+            preferences.incCurrentSteps(1)
+            numSteps++
 
         if (numSteps%100==0){
-            SavedPreference.incrementSavedSteps(100)
-            FDatabaseWriter.writeSteps(100)
+            App.it().appComponent.statisticInteractor.create(100)
         }
-
-
-
-
-        App.it().appComponent.editor.putInt("steps", numSteps)
-        App.it().appComponent.editor.commit()
     }
 
+
     fun start(){
+        preferences.clearSentSteps()
+        preferences.clearCurrentSteps()
+        preferences.clearCurrentDistance()
+
         numSteps = 0
         sensorManager!!.registerListener(
             this,
@@ -73,7 +66,16 @@ class PedometerManager: SensorEventListener, StepListener {
     }
 
     fun stop(){
-        sensorManager!!.unregisterListener(this)
-    }
+        val stepsRemainder = preferences.currentSteps - preferences.sentSteps
+        println("остаток ?? $stepsRemainder, ${preferences.currentAds} ${preferences.sentSteps}")
 
+        App.it().appComponent.statisticInteractor.create(stepsRemainder)
+
+
+
+        sensorManager!!.unregisterListener(this)
+
+        preferences.clearCurrentSteps()
+
+    }
 }
